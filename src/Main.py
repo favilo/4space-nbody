@@ -4,7 +4,7 @@ from pyopencl.elementwise import ElementwiseKernel
 
 import numpy
 
-cross4_preamble = """
+distance_preamble = """
     float distance2(float4 a,
             float4 b)
     {   
@@ -13,7 +13,9 @@ cross4_preamble = """
             (a.z*a.z - b.z*b.z) +
             (a.w*a.w - b.w*b.w);
     }
+"""
 
+cross4_preamble = """
     float4 cross4(float4 u,
             float4 v,
             float4 w)
@@ -47,6 +49,13 @@ cross4 = ElementwiseKernel(ctx,
         "__global       float4 *r",
         "r[i] = cross4(u[i],v[i],w[i])",
         "cross4_final", preamble=cross4_preamble)
+
+distance2 = ElementwiseKernel(ctx,
+        "__global const float4 *a, "
+        "__global const float4 *b, "
+        "__global       float4 *d",
+        "d[i] = distance2(a[i],b[i])",
+        "distance_final", preamble=distance_preamble)
 
 
 a = numpy.random.randn(4,4).astype(numpy.float32)
